@@ -21,36 +21,40 @@ showChat.addEventListener("click", () => {
 
 const user = prompt("Enter your name");
 
-var peer = new Peer({
-  host: '127.0.0.1',
-  port: 3030,
-  path: '/peerjs',
-  config: {
-    'iceServers': [
-      { url: 'stun:stun01.sipphone.com' },
-      { url: 'stun:stun.ekiga.net' },
-      { url: 'stun:stunserver.org' },
-      { url: 'stun:stun.softjoys.com' },
-      { url: 'stun:stun.voiparound.com' },
-      { url: 'stun:stun.voipbuster.com' },
-      { url: 'stun:stun.voipstunt.com' },
-      { url: 'stun:stun.voxgratia.org' },
-      { url: 'stun:stun.xten.com' },
-      {
-        url: 'turn:192.158.29.39:3478?transport=udp',
-        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        username: '28224511:1379330808'
-      },
-      {
-        url: 'turn:192.158.29.39:3478?transport=tcp',
-        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        username: '28224511:1379330808'
-      }
-    ]
-  },
+function checkSafari() {
+  let seemsChrome = navigator.userAgent.indexOf("Chrome") > -1;
+  let seemsSafari = navigator.userAgent.indexOf("Safari") > -1;
+  return seemsSafari && !seemsChrome;
+}
 
-  debug: 3
-});
+let peerOptions = {};
+
+// if (checkSafari()) {
+//   peerOptions.serialization = "json";
+// }
+
+  var peer = new Peer({
+    host: 'c7be-154-237-10-154.ngrok-free.app',
+    path: '/peerjs',
+    serialization : 'json',
+    config: {
+      'iceServers': [
+        { url: 'stun:stun01.sipphone.com' },
+        { url: 'stun:stun.ekiga.net' },
+        { url: 'stun:stunserver.org' },
+        { url: 'stun:stun.softjoys.com' },
+        { url: 'stun:stun.voiparound.com' },
+        { url: 'stun:stun.voipbuster.com' },
+        { url: 'stun:stun.voipstunt.com' },
+        { url: 'stun:stun.voxgratia.org' },
+        { url: 'stun:stun.xten.com' },
+       
+      ]
+    },
+  
+    debug: 3
+  });
+  
 
 let myVideoStream;
 navigator.mediaDevices
@@ -74,6 +78,10 @@ navigator.mediaDevices
     socket.on("user-connected", (userId) => {
       connectToNewUser(userId, stream);
     });
+  }).catch((error) => {
+
+console.log('error: '+ error)
+
   });
 
 const connectToNewUser = (userId, stream) => {
@@ -93,8 +101,14 @@ peer.on("open", (id) => {
 const addVideoStream = (video, stream) => {
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
-    video.play();
-    videoGrid.append(video);
+   
+    try{
+      video.play();
+      videoGrid.append(video);
+    }
+    catch(error){
+      alert(error)
+    }
   });
 };
 
